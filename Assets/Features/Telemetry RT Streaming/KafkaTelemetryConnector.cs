@@ -1,3 +1,49 @@
+using Confluent.Kafka;
+using System;
+using System.Threading.Tasks;
+
+namespace Perrinn424.TelemetryLapSystem
+{
+    public class KafkaTelemetryConnector
+    {
+        private string bootstrapServers;
+        private IProducer<Null, string> producer;
+
+        public KafkaTelemetryConnector(string bootstrapServers)
+        {
+            this.bootstrapServers = bootstrapServers;
+        }
+
+        public async Task ConnectAndSendAsync(string topic, string message)
+        {
+            var config = new ProducerConfig { BootstrapServers = bootstrapServers };
+            
+            // Create a new producer instance
+            using (var producer = new ProducerBuilder<Null, string>(config).Build())
+            {
+                try
+                {
+                    // Construct the message to send
+                    var kafkaMessage = new Message<Null, string>
+                    {
+                        Value = message
+                    };
+
+                    // Produce the message to the specified topic
+                    var deliveryResult = await producer.ProduceAsync(topic, kafkaMessage);
+
+                    // Log the delivery result
+                    Console.WriteLine($"Message delivered to {deliveryResult.TopicPartitionOffset}");
+                }
+                catch (ProduceException<Null, string> e)
+                {
+                    Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+                }
+            }
+        }
+    }
+}
+
 /*
 Yes, that's the Telemetry system in the vehicle. 
 When you have a reference to the vehicle controller, then vehicleController.telemetry.latest gives you the latest recorded datarow with all the channel values. 
@@ -23,18 +69,21 @@ Flow:
  - PostFlight: Sever Connection to Server at end of session (simulation ends)
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Confluent.Kafka;
-using UnityEngine;
-using VehiclePhysics;
+//using System;
+//using System.Collections.Generic;
+//using System.Linq;
+//using Confluent.Kafka;
+//using UnityEngine;
+//using VehiclePhysics;
 
-namespace Perrinn424.TelemetryLapSystem
-{
+//namespace Perrinn424.TelemetryLapSystem
+
+//{
     //[Serializable]
-    public class KafkaTelemetryConnector
-    {
+//    public class KafkaTelemetryConnector
+//    {
+
+        
         // [SerializeField]
         // private string[] channels;
         // public string[] Units { get; private set; }
@@ -254,5 +303,5 @@ namespace Perrinn424.TelemetryLapSystem
         //     producer.Flush(TimeSpan.FromSeconds(10));
         //     producer.Dispose();
         // }
-    }
-}
+//    }
+//}
