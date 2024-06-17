@@ -1,6 +1,7 @@
 using Confluent.Kafka;
 using System;
 using System.Threading.Tasks;
+using UnityEngine;
 
 namespace Perrinn424.TelemetryLapSystem
 {
@@ -33,16 +34,17 @@ namespace Perrinn424.TelemetryLapSystem
                     var deliveryResult = await producer.ProduceAsync(topic, kafkaMessage);
 
                     // Log the delivery result
-                    Console.WriteLine($"Message delivered to {deliveryResult.TopicPartitionOffset}");
+                    Debug.Log($"Message delivered to {deliveryResult.TopicPartitionOffset}");
                 }
                 catch (ProduceException<Null, string> e)
                 {
-                    Console.WriteLine($"Delivery failed: {e.Error.Reason}");
+                    Debug.Log($"Delivery failed: {e.Error.Reason}");
                 }
             }
         }
     }
 }
+
 
 /*
 Yes, that's the Telemetry system in the vehicle. 

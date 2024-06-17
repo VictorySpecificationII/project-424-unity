@@ -52,28 +52,50 @@
 using System;
 using UnityEngine;
 using VehiclePhysics;
+using EdyCommonTools;
 
-namespace Perrinn424.TelemetryLapSystem
-{
-    public class Program : MonoBehaviour
-    {
-        async void Start()
-        {
-            string bootstrapServers = "10.144.0.2:9092";
-            string topic = "test-topic";
-            string message = "Hello, Kafka!";
+namespace Perrinn424.TelemetryLapSystem{
 
-            KafkaTelemetryConnector connector = new KafkaTelemetryConnector(bootstrapServers);
-            await connector.ConnectAndSendAsync(topic, message);
+    public class KafkaTelemetryClient : MonoBehaviour{
 
-            // Optionally, you can add delay or other logic here
-            // await Task.Delay(TimeSpan.FromSeconds(1));
-
-            // Example: Unity specific logging
-            Debug.Log("Message sent to Kafka!");
-
-            // Quit the application (optional, if desired)
-            Application.Quit();
+        [Serializable]
+        public class Settings{
+        
+            public string bootstrapServers = "10.144.0.2:9092";
+            public string topic = "test-topic";
+            public string message = "Hello, Kafka!";
+        
         }
+
+
+    	public bool kafkaEnabled = true;
+        public Settings settings = new Settings();            
+        private KafkaTelemetryConnector connector;
+        
+
+
+        void OnEnableVehicle (){
+
+            Debug.Log("Kafka Telemetry Experiment Started");	
+            connector = new KafkaTelemetryConnector(settings.bootstrapServers);
+
+        }
+
+        void Update (){
+            //The Update method in Unity cannot be async, because it is called once per frame and should not be awaited.
+            // Instead, we call an asynchronous method SendKafkaMessageAsync from within Update.        
+            SendKafkaMessageAsync();
+
+        }
+
+        private async void SendKafkaMessageAsync(){
+            await connector.ConnectAndSendAsync(settings.topic, settings.message);
+            Debug.Log("Message sent to Kafka!");
+        }
+
+        void OnDisableVehicle (){
+            Debug.Log("Kafka Telemetry Experiment Stopped");
+        }
+
     }
 }
