@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Perrinn424.TelemetryLapSystem
 {
-    public class KafkaTelemetryConnector
+    public class KafkaTelemetryConnector : MonoBehaviour
     {
         private string bootstrapServers;
         private IProducer<Null, string> producer;

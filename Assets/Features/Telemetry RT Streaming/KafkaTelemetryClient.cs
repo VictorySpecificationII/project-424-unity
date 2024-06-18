@@ -89,8 +89,14 @@ namespace Perrinn424.TelemetryLapSystem{
         }
 
         private async void SendKafkaMessageAsync(){
-            await connector.ConnectAndSendAsync(settings.topic, settings.message);
-            Debug.Log("Message sent to Kafka!");
+            Debug.Log("MessageFct Triggered");
+            // try{
+            //     await connector.ConnectAndSendAsync(settings.topic, settings.message);
+            //     Debug.Log("Message sent to Kafka!");
+            // }
+            // catch (Exception e){
+            //     Debug.LogException(e, this);
+            // }
         }
 
         void OnDisableVehicle (){
