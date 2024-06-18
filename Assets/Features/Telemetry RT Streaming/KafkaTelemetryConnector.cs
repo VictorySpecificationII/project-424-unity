@@ -8,7 +8,7 @@ namespace Perrinn424.TelemetryLapSystem
     public class KafkaTelemetryConnector : MonoBehaviour
     {
         private string bootstrapServers;
-        private IProducer<Null, string> producer;
+        private IProducer<string, string> producer;
 
         public KafkaTelemetryConnector(string bootstrapServers)
         {
@@ -20,12 +20,12 @@ namespace Perrinn424.TelemetryLapSystem
             var config = new ProducerConfig { BootstrapServers = bootstrapServers };
             
             // Create a new producer instance
-            using (var producer = new ProducerBuilder<Null, string>(config).Build())
+            using (var producer = new ProducerBuilder<string, string>(config).Build())
             {
                 try
                 {
                     // Construct the message to send
-                    var kafkaMessage = new Message<Null, string>
+                    var kafkaMessage = new Message<string, string>
                     {
                         Value = message
                     };
@@ -36,7 +36,7 @@ namespace Perrinn424.TelemetryLapSystem
                     // Log the delivery result
                     Debug.Log($"Message delivered to {deliveryResult.TopicPartitionOffset}");
                 }
-                catch (ProduceException<Null, string> e)
+                catch (ProduceException<string, string> e)
                 {
                     Debug.Log($"Delivery failed: {e.Error.Reason}");
                 }

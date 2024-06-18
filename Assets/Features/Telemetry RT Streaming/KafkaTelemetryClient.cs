@@ -74,11 +74,15 @@ namespace Perrinn424.TelemetryLapSystem{
         
 
 
-        void OnEnableVehicle (){
+        void Awake (){
 
             Debug.Log("Kafka Telemetry Experiment Started");	
             connector = new KafkaTelemetryConnector(settings.bootstrapServers);
 
+        }
+
+        void onEnableVehicle (){
+            Debug.Log("OnEnabledVehicle Reached");
         }
 
         void Update (){
@@ -89,14 +93,13 @@ namespace Perrinn424.TelemetryLapSystem{
         }
 
         private async void SendKafkaMessageAsync(){
-            Debug.Log("MessageFct Triggered");
-            // try{
-            //     await connector.ConnectAndSendAsync(settings.topic, settings.message);
-            //     Debug.Log("Message sent to Kafka!");
-            // }
-            // catch (Exception e){
-            //     Debug.LogException(e, this);
-            // }
+            try{
+                await connector.ConnectAndSendAsync(settings.topic, settings.message);
+                Debug.Log("Message sent to Kafka!");
+            }
+            catch (Exception e){
+                Debug.LogException(e, this);
+            }
         }
 
         void OnDisableVehicle (){
