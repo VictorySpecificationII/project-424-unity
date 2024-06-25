@@ -2,6 +2,9 @@ using Confluent.Kafka;
 using System;
 using System.Threading.Tasks;
 using UnityEngine;
+using System.Collections.Generic;
+using System.Linq;
+using VehiclePhysics;
 
 namespace Perrinn424.TelemetryLapSystem
 {
@@ -9,6 +12,8 @@ namespace Perrinn424.TelemetryLapSystem
     {
         private string bootstrapServers;
         private IProducer<string, string> producer;
+        private VehicleBase vehicle;
+        private Telemetry.DataRow DataRow => vehicle.telemetry.latest;
 
         public KafkaTelemetryConnector(string bootstrapServers)
         {
