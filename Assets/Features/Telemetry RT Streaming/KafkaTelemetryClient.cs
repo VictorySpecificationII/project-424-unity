@@ -63,7 +63,7 @@ namespace Perrinn424.TelemetryLapSystem{
         
             public string bootstrapServers = "10.144.0.2:9092";
             public string topic = "test-topic";
-            public string message = "Hello, Kafka!";
+            //public string message = "Hello, Kafka!";
         
         }
 
@@ -94,7 +94,7 @@ namespace Perrinn424.TelemetryLapSystem{
 
         private async void SendKafkaMessageAsync(){
             try{
-                await connector.ConnectAndSendAsync(settings.topic, settings.message);
+                await connector.ConnectAndSendAsync(settings.topic/*, settings.message*/);
                 Debug.Log("Message sent to Kafka!");
             }
             catch (Exception e){

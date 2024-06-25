@@ -14,14 +14,21 @@ namespace Perrinn424.TelemetryLapSystem
         private string bootstrapServers;
         private IProducer<string, string> producer;
         private VehicleBase vehicle;
-        private Telemetry.DataRow DataRow => vehicle.telemetry.latest;
 
         public KafkaTelemetryConnector(string bootstrapServers)
         {
             this.bootstrapServers = bootstrapServers;
         }
 
-        public async Task ConnectAndSendAsync(string topic, string message)
+        private string DataRowToJson()
+        {
+            string json = "test!!";
+            //string json = JsonConvert.SerializeObject(vehicle.telemetry.latest);
+            return json;
+        }
+
+
+        public async Task ConnectAndSendAsync(string topic/*, string message*/)
         {
             var config = new ProducerConfig { BootstrapServers = bootstrapServers };
             
@@ -30,10 +37,11 @@ namespace Perrinn424.TelemetryLapSystem
             {
                 try
                 {
+                    string jsonMessage = DataRowToJson();
                     // Construct the message to send
                     var kafkaMessage = new Message<string, string>
                     {
-                        Value = message
+                        Value = jsonMessage
                     };
 
                     // Produce the message to the specified topic
