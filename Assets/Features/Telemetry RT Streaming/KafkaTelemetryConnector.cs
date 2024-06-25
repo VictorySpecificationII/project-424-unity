@@ -22,8 +22,9 @@ namespace Perrinn424.TelemetryLapSystem
 
         private string DataRowToJson()
         {
+            //Telemetry.DataRow latestTelemetry = vehicle.telemetry.latest;
+            //string json = JsonConvert.SerializeObject(latestTelemetry);
             string json = "test!!";
-            //string json = JsonConvert.SerializeObject(vehicle.telemetry.latest);
             return json;
         }
 
