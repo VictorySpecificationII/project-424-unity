@@ -56,7 +56,7 @@ using EdyCommonTools;
 
 namespace Perrinn424.TelemetryLapSystem{
 
-    public class KafkaTelemetryClient : MonoBehaviour{
+    public class KafkaTelemetryClient : VehicleBehaviour{
 
         [Serializable]
         public class Settings{
@@ -102,7 +102,7 @@ namespace Perrinn424.TelemetryLapSystem{
             }
         }
 
-        void OnDisableVehicle (){
+        public override void OnDisableVehicle (){
             Debug.Log("Kafka Telemetry Experiment Stopped");
         }
 

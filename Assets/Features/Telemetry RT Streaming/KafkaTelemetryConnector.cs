@@ -9,11 +9,10 @@ using Newtonsoft.Json;
 
 namespace Perrinn424.TelemetryLapSystem
 {
-    public class KafkaTelemetryConnector : MonoBehaviour
+    public class KafkaTelemetryConnector : VehicleBehaviour
     {
         private string bootstrapServers;
         private IProducer<string, string> producer;
-        private VehicleBase vehicle;
 
         public KafkaTelemetryConnector(string bootstrapServers)
         {
@@ -22,7 +21,6 @@ namespace Perrinn424.TelemetryLapSystem
 
         private string DataRowToJson()
         {
-            // vehicle = GetComponent<VehicleBase>();
             // Telemetry.DataRow latestTelemetry = vehicle.telemetry.latest;
             // string json = JsonConvert.SerializeObject(latestTelemetry);
             string json = "test!!";
