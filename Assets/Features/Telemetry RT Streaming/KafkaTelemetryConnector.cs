@@ -20,11 +20,6 @@ namespace Perrinn424.TelemetryLapSystem
             this.bootstrapServers = bootstrapServers;
         }
 
-        private void Awake()
-        {
-            vehicle = GetComponentInParent<VehicleBase>();
-        }
-
         private string DataRowToJson()
         {
             string json = "test!!";
