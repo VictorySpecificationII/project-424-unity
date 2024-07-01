@@ -13,7 +13,8 @@ namespace Perrinn424.TelemetryLapSystem
     {
         private string bootstrapServers;
         private IProducer<string, string> producer;
-
+        VehicleBase vehicle;
+        
         public KafkaTelemetryConnector(string bootstrapServers)
         {
             this.bootstrapServers = bootstrapServers;
@@ -21,7 +22,9 @@ namespace Perrinn424.TelemetryLapSystem
 
         private string DataRowToJson()
         {
-            // Telemetry.DataRow latestTelemetry = vehicle.telemetry.latest;
+            vehicle = GetComponent<VehicleBase>();
+            Telemetry.DataRow latestTelemetry = vehicle.telemetry.latest;
+            Debug.Log(latestTelemetry);
             // string json = JsonConvert.SerializeObject(latestTelemetry);
             string json = "test!!";
             return json;
