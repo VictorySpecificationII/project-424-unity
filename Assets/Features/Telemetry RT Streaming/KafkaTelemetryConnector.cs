@@ -9,7 +9,7 @@ using System.Linq;
 using VehiclePhysics;
 using Newtonsoft.Json;
 
-namespace Perrinn424.TelemetryLapSystem
+namespace Perrinn424
 {
     public class KafkaTelemetryConnector : VehicleBehaviour
     {
