@@ -91,7 +91,8 @@ public class KafkaTelemetryProvider : VehicleBehaviour{
 
         private string DataRowToJson()
         {
-            string json = "test!!";
+            Telemetry.DataRow latest = vehicle.telemetry.latest;
+            string json = JsonConvert.SerializeObject(latest);
             return json;
         }
 
