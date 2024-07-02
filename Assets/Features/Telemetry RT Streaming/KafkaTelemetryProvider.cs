@@ -14,9 +14,13 @@ public class KafkaTelemetryProvider : VehicleBehaviour{
 
 	public override void OnEnableVehicle ()
 		{
-
+		Debug.Log("Provider for Kafka Enabled");
 		}
 
+	public override void OnDisableVehicle ()
+		{
+		Debug.Log("Provider for Kafka Disabled");
+		}
 
 	public override bool EmitTelemetry ()
 		{
@@ -38,33 +42,6 @@ public class KafkaTelemetryProvider : VehicleBehaviour{
 
 	public class Perrinn424Distance : Telemetry.ChannelGroup
 		{
-		public override int GetChannelCount ()
-			{
-			return 2;
-			}
-
-
-		public override Telemetry.PollFrequency GetPollFrequency ()
-			{
-			return Telemetry.PollFrequency.Normal;
-			}
-
-
-		public override void GetChannelInfo (Telemetry.ChannelInfo[] channelInfo, Object instance)
-			{
-			VehicleBase vehicle = instance as VehicleBase;
-
-			// Custom distance semantic
-
-			var distanceSemantic = new Telemetry.SemanticInfo();
-			distanceSemantic.SetRangeAndFormat(0, 21000, "0.000", " km", multiplier:0.001f, quantization:1000);
-
-			// Fill-in channel information
-
-			channelInfo[0].SetNameAndSemantic("LapDistance", Telemetry.Semantic.Custom, distanceSemantic);
-			channelInfo[1].SetNameAndSemantic("TotalDistance", Telemetry.Semantic.Custom, distanceSemantic);
-			}
-
 
 		public override void PollValues (float[] values, int index, Object instance)
 			{
@@ -73,9 +50,6 @@ public class KafkaTelemetryProvider : VehicleBehaviour{
 			Telemetry.DataRow latest = vehicle.telemetry.latest;
             string json = JsonConvert.SerializeObject(latest);
             Debug.Log(json);
-
-			values[index+0] = (float)latest.distance;
-			values[index+1] = (float)latest.totalDistance;
 			}
 		}
 	}
