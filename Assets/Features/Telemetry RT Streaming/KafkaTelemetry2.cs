@@ -343,7 +343,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 			}
 		}
 
-		private async Task SendKafkaMessageAsync(string message)
+		private static async Task SendKafkaMessageAsync(string message)
 		{
 			var config = new ProducerConfig { BootstrapServers = "10.144.0.2:9092" };
 
