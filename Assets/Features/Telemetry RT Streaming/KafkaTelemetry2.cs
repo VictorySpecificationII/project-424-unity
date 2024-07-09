@@ -4,7 +4,8 @@ using VehiclePhysics;
 using VehiclePhysics.InputManagement;
 using EdyCommonTools;
 using Newtonsoft.Json;
-
+using Confluent.Kafka;
+using System.Threading.Tasks;
 
 namespace Perrinn424
 {
@@ -335,9 +336,35 @@ public class KafkaTelemetry2: VehicleBehaviour
 			Telemetry.DataRow latest = vehicle.telemetry.latest;
             string json = JsonConvert.SerializeObject(latest);
             Debug.Log(json);
+			SendKafkaMessageAsync(json);
 
 			values[index+0] = (float)latest.distance;
 			values[index+1] = (float)latest.totalDistance;
+			}
+		}
+
+		private async Task SendKafkaMessageAsync(string message)
+		{
+			var config = new ProducerConfig { BootstrapServers = "10.144.0.2:9092" };
+
+			// Create a new producer instance
+			using (var producer = new ProducerBuilder<Null, string>(config).Build())
+			{
+				try
+				{
+					// Construct the message to send
+					var kafkaMessage = new Message<Null, string> { Value = message };
+
+					// Produce the message to the specified topic
+					var deliveryResult = await producer.ProduceAsync("my-topic", kafkaMessage);
+
+					// Log the delivery result
+					Debug.Log($"Message delivered to {deliveryResult.TopicPartitionOffset}");
+				}
+				catch (ProduceException<Null, string> e)
+				{
+					Debug.Log($"Delivery failed: {e.Error.Reason}");
+				}
 			}
 		}
 
