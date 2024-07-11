@@ -56,15 +56,15 @@ public class KafkaTelemetry2: VehicleBehaviour
 			{
 			VehicleBase vehicle = instance as VehicleBase;
 
-			// Custom distance semantic
+			// // Custom distance semantic
 
-			var distanceSemantic = new Telemetry.SemanticInfo();
-			distanceSemantic.SetRangeAndFormat(0, 21000, "0.000", " km", multiplier:0.001f, quantization:1000);
+			// var distanceSemantic = new Telemetry.SemanticInfo();
+			// distanceSemantic.SetRangeAndFormat(0, 21000, "0.000", " km", multiplier:0.001f, quantization:1000);
 
-			// Fill-in channel information
+			// // Fill-in channel information
 
-			channelInfo[0].SetNameAndSemantic("LapDistance", Telemetry.Semantic.Custom, distanceSemantic);
-			channelInfo[1].SetNameAndSemantic("TotalDistance", Telemetry.Semantic.Custom, distanceSemantic);
+			// channelInfo[0].SetNameAndSemantic("LapDistance", Telemetry.Semantic.Custom, distanceSemantic);
+			// channelInfo[1].SetNameAndSemantic("TotalDistance", Telemetry.Semantic.Custom, distanceSemantic);
 			}
 
 
@@ -74,11 +74,11 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 			Telemetry.DataRow latest = vehicle.telemetry.latest;
             string json = JsonConvert.SerializeObject(latest);
-            Debug.Log(json);
+            //Debug.Log(json);
 			SendKafkaMessageAsync(json);
 
-			values[index+0] = (float)latest.distance;
-			values[index+1] = (float)latest.totalDistance;
+			// values[index+0] = (float)latest.distance;
+			// values[index+1] = (float)latest.totalDistance;
 			}
 		}
 
@@ -93,6 +93,8 @@ public class KafkaTelemetry2: VehicleBehaviour
 				{
 					// Construct the message to send
 					var kafkaMessage = new Message<Null, string> { Value = message };
+
+					Debug.Log($"Message content: {kafkaMessage.Value}");
 
 					// Produce the message to the specified topic
 					var deliveryResult = await producer.ProduceAsync("my-topic", kafkaMessage);
