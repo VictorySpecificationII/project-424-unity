@@ -72,9 +72,29 @@ public class KafkaTelemetry2: VehicleBehaviour
 			{
 			VehicleBase vehicle = instance as VehicleBase;
 
+			int numChannels = vehicle.telemetry.latest.values.Length;
+			for (int i = 0; i <= numChannels -1; i++){
+		    	Debug.Log(vehicle.telemetry.latest.values[i]);
+				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix);
+				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin);
+				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax);
+				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier);
+			}
+
+		    // Get the value for the fourth channel.
+
+		    //float channelValue = vehicle.telemetry.latest.values[3];
+
+		    // Get the string with the units that may be appended to the value. It may include leading spaces.
+
+		    //string channelUnits = vehicle.telemetry.GetChannelSemmantic(12).displayUnitsSuffix;
+
+		    // Alternatively, we can get a formatted string with both value and units.
+		    //string channelValueWithUnits = vehicle.telemetry.FormatChannelValue(3);
+
 			Telemetry.DataRow latest = vehicle.telemetry.latest;
             string json = JsonConvert.SerializeObject(latest);
-            //Debug.Log(json);
+            Debug.Log(json);
 			SendKafkaMessageAsync(json);
 
 			// values[index+0] = (float)latest.distance;
@@ -84,7 +104,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 		private static async Task SendKafkaMessageAsync(string message)
 		{
-			var config = new ProducerConfig { BootstrapServers = "10.144.0.2:9092" };
+			var config = new ProducerConfig { BootstrapServers = "192.168.1.72:9092" };
 
 			// Create a new producer instance
 			using (var producer = new ProducerBuilder<Null, string>(config).Build())
