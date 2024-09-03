@@ -74,10 +74,30 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 			int numChannels = vehicle.telemetry.latest.values.Length;
 			for (int i = 0; i <= numChannels -1; i++){
-				//UNDER DEVELOPMENT
+			
+			//UNDER DEVELOPMENT
 
-				//Debug.Log(vehicle.telemetry.channelInfo.group);
-				Debug.Log(vehicle.telemetry.channels[i].fullName); //Get name of channel				
+			// Retrieve ChannelInfo object
+			Telemetry.ChannelInfo channelInfo = vehicle.telemetry.channels[i];
+
+			// Retrieve ChannelGroupInfo object
+			Telemetry.ChannelGroupInfo groupInfo = channelInfo.group;
+
+			int count = groupInfo.channelCount;
+			var expectedFreq = groupInfo.expectedFrequency;
+			float actualFreq = groupInfo.actualFrequency;
+			int interval = groupInfo.updateInterval;
+			string frequencyLabel = groupInfo.updateFrequencyLabel;
+
+
+			//Output or use the values as needed
+			Debug.Log($"Channel Count: {count}");
+			Debug.Log($"Expected Frequency: {expectedFreq}");
+			Debug.Log($"Actual Frequency: {actualFreq}");
+			Debug.Log($"Update Interval: {interval}");
+			Debug.Log($"Frequency Label: {frequencyLabel}");
+
+
 				//FUNCTIONING
 				//Debug.Log(vehicle.telemetry.channels[i].name); //Get name of channel
 		    	// Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
