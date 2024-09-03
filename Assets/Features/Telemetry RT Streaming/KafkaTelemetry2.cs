@@ -76,6 +76,16 @@ public class KafkaTelemetry2: VehicleBehaviour
 			for (int i = 0; i <= numChannels -1; i++){
 				Debug.Log(i);
 			
+			/*
+			in game telemetry screen
+			channel number
+			semantic
+			group
+			update frequency
+			channel minimum value
+			channel maximum value
+			latest value
+			*/
 			//UNDER DEVELOPMENT
 
 			// Retrieve ChannelInfo object
