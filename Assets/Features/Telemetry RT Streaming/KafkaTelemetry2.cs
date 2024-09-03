@@ -80,7 +80,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 				Debug.Log(vehicle.telemetry.channels[i].fullName); //Get name of channel				
 				//FUNCTIONING
 				//Debug.Log(vehicle.telemetry.channels[i].name); //Get name of channel
-		    		// Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
+		    	// Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
 				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix); //Get unit of channel
 				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin); // Get minimum value
 				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax); // Get maximum value
