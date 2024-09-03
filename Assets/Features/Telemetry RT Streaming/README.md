@@ -26,6 +26,11 @@ You shouldn't need to install it, but in case you do:
  - https://stackoverflow.com/questions/64434605/getting-error-cannot-find-any-csproj-or-fsproj-file-for-your-project-please-f
  - https://developer.confluent.io/get-started/dotnet/
 
+# TODO
+
+ - [ ] check how to get the groups for telemetry
+ - [ ] construct json message structure (current version has null key)
+ - [ ] send messages to kafka, one at a time
 
 # WARNING: DEPRECATED :WARNING
 
