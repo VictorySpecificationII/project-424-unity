@@ -74,11 +74,17 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 			int numChannels = vehicle.telemetry.latest.values.Length;
 			for (int i = 0; i <= numChannels -1; i++){
-		    	Debug.Log(vehicle.telemetry.latest.values[i]);
-				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix);
-				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin);
-				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax);
-				Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier);
+				//UNDER DEVELOPMENT
+
+				//Debug.Log(vehicle.telemetry.channelInfo.group);
+				Debug.Log(vehicle.telemetry.channels[i].fullName); //Get name of channel				
+				//FUNCTIONING
+				//Debug.Log(vehicle.telemetry.channels[i].name); //Get name of channel
+		    		// Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
+				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix); //Get unit of channel
+				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin); // Get minimum value
+				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax); // Get maximum value
+				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier); // Get multiplier
 			}
 
 		    // Get the value for the fourth channel.
@@ -92,10 +98,10 @@ public class KafkaTelemetry2: VehicleBehaviour
 		    // Alternatively, we can get a formatted string with both value and units.
 		    //string channelValueWithUnits = vehicle.telemetry.FormatChannelValue(3);
 
-			Telemetry.DataRow latest = vehicle.telemetry.latest;
-            string json = JsonConvert.SerializeObject(latest);
-            Debug.Log(json);
-			SendKafkaMessageAsync(json);
+			//Telemetry.DataRow latest = vehicle.telemetry.latest;
+            //string json = JsonConvert.SerializeObject(latest);
+            //Debug.Log(json);
+			//SendKafkaMessageAsync(json);
 
 			// values[index+0] = (float)latest.distance;
 			// values[index+1] = (float)latest.totalDistance;
