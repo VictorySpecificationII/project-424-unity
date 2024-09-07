@@ -74,7 +74,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 			int numChannels = vehicle.telemetry.latest.values.Length;
 			for (int i = 0; i <= numChannels -1; i++){
-				Debug.Log(i);
+
 			
 			/*
 			in game telemetry screen
@@ -94,37 +94,38 @@ public class KafkaTelemetry2: VehicleBehaviour
 			// Retrieve ChannelGroupInfo object
 			Telemetry.ChannelGroupInfo groupInfo = channelInfo.group;
 
-			// var channel_group = groupInfo.channels;
-			// int count = groupInfo.channelCount;
-			// var expectedFreq = groupInfo.expectedFrequency;
-			// float actualFreq = groupInfo.actualFrequency;
-			// int interval = groupInfo.updateInterval;
-			// string frequencyLabel = groupInfo.updateFrequencyLabel;
+			string channel_group = groupInfo.channels.ToString();
+			int count = groupInfo.channelCount;
+			string expectedFreq = groupInfo.expectedFrequency.ToString();
+			float actualFreq = groupInfo.actualFrequency;
+			int interval = groupInfo.updateInterval;
+			string frequencyLabel = groupInfo.updateFrequencyLabel;
 
 
 			// //Output or use the values as needed
-			// Debug.Log($"Channel Count: {channel_group}");
-			// Debug.Log($"Channel Count: {count}");
-			// Debug.Log($"Expected Frequency: {expectedFreq}");
-			// Debug.Log($"Actual Frequency: {actualFreq}");
-			// Debug.Log($"Update Interval: {interval}");
-			// Debug.Log($"Frequency Label: {frequencyLabel}");
+			Debug.Log($"Channel ID: {i}");
+			Debug.Log($"Channel Group: {channel_group}");
+			Debug.Log($"Channel Count: {count}");
+			Debug.Log($"Expected Frequency: {expectedFreq}");
+			Debug.Log($"Actual Frequency: {actualFreq}");
+			Debug.Log($"Update Interval: {interval}");
+			Debug.Log($"Frequency Label: {frequencyLabel}");
 
 			// Access the semantic information
-			// Telemetry.Semantic semantic = channelInfo.semantic;
+			Telemetry.Semantic semantic = channelInfo.semantic;
 			// Telemetry.SemanticInfo customSemantic = channelInfo.customSemantic;//dont use for now, until you figure it out
 
 			// Log or use the semantic information
-			// Debug.Log($"Semantic: {semantic}");
+			Debug.Log($"Semantic: {semantic}");
 			// Debug.Log($"Custom Semantic: {customSemantic}");
 
 			//FUNCTIONING
-			//Debug.Log(vehicle.telemetry.channels[i].name); //Get name of channel
-		    // Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
-			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix); //Get unit of channel
-			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin); // Get minimum value
-			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax); // Get maximum value
-			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier); // Get multiplier
+			Debug.Log($"Channel Name: {vehicle.telemetry.channels[i].name}"); //Get name of channel
+		    Debug.Log($"Channel Value: {vehicle.telemetry.latest.values[i]}"); // Get value of channel
+			Debug.Log($"Channel Unit: {vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix}"); //Get unit of channel
+			Debug.Log($"Channel Minimum: {vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin}"); // Get minimum value
+			Debug.Log($"Channel Maximum: {vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax}"); // Get maximum value
+			Debug.Log($"Channel Multiplier: {vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier}"); // Get multiplier
 			}
 
 		    // Get the value for the fourth channel.
