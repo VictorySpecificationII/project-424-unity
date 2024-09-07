@@ -94,6 +94,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 			// Retrieve ChannelGroupInfo object
 			Telemetry.ChannelGroupInfo groupInfo = channelInfo.group;
 
+			// var channel_group = groupInfo.channels;
 			// int count = groupInfo.channelCount;
 			// var expectedFreq = groupInfo.expectedFrequency;
 			// float actualFreq = groupInfo.actualFrequency;
@@ -102,6 +103,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 
 			// //Output or use the values as needed
+			// Debug.Log($"Channel Count: {channel_group}");
 			// Debug.Log($"Channel Count: {count}");
 			// Debug.Log($"Expected Frequency: {expectedFreq}");
 			// Debug.Log($"Actual Frequency: {actualFreq}");
@@ -116,13 +118,13 @@ public class KafkaTelemetry2: VehicleBehaviour
 			// Debug.Log($"Semantic: {semantic}");
 			// Debug.Log($"Custom Semantic: {customSemantic}");
 
-				//FUNCTIONING
-				//Debug.Log(vehicle.telemetry.channels[i].name); //Get name of channel
-		    	// Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
-				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix); //Get unit of channel
-				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin); // Get minimum value
-				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax); // Get maximum value
-				// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier); // Get multiplier
+			//FUNCTIONING
+			//Debug.Log(vehicle.telemetry.channels[i].name); //Get name of channel
+		    // Debug.Log(vehicle.telemetry.latest.values[i]); // Get value of channel
+			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix); //Get unit of channel
+			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin); // Get minimum value
+			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax); // Get maximum value
+			// Debug.Log(vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier); // Get multiplier
 			}
 
 		    // Get the value for the fourth channel.
