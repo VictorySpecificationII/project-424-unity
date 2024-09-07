@@ -119,13 +119,27 @@ public class KafkaTelemetry2: VehicleBehaviour
 			Debug.Log($"Semantic: {semantic}");
 			// Debug.Log($"Custom Semantic: {customSemantic}");
 
+			var channel_name = vehicle.telemetry.channels[i].name;
+			var channel_value = vehicle.telemetry.latest.values[i];
+			var channel_unit = vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix;
+			var channel_min_value = vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin;
+			var channel_max_value = vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax;
+			var channel_multiplier = vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier;
+
+			Debug.Log($"Channel Name: {channel_name}");
+			Debug.Log($"Channel Value: {channel_value}");
+			Debug.Log($"Channel_Unit: {channel_unit}");
+			Debug.Log($"Channel Min: {channel_min_value}");
+			Debug.Log($"Channel Max: {channel_max_value}");
+			Debug.Log($"Channel Multiplier: {channel_multiplier}");
+
 			//FUNCTIONING
-			Debug.Log($"Channel Name: {vehicle.telemetry.channels[i].name}"); //Get name of channel
-		    Debug.Log($"Channel Value: {vehicle.telemetry.latest.values[i]}"); // Get value of channel
-			Debug.Log($"Channel Unit: {vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix}"); //Get unit of channel
-			Debug.Log($"Channel Minimum: {vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin}"); // Get minimum value
-			Debug.Log($"Channel Maximum: {vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax}"); // Get maximum value
-			Debug.Log($"Channel Multiplier: {vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier}"); // Get multiplier
+			// Debug.Log($"Channel Name: {vehicle.telemetry.channels[i].name}"); //Get name of channel
+		    // Debug.Log($"Channel Value: {vehicle.telemetry.latest.values[i]}"); // Get value of channel
+			// Debug.Log($"Channel Unit: {vehicle.telemetry.GetChannelSemmantic(i).displayUnitsSuffix}"); //Get unit of channel
+			// Debug.Log($"Channel Minimum: {vehicle.telemetry.GetChannelSemmantic(i).displayRangeMin}"); // Get minimum value
+			// Debug.Log($"Channel Maximum: {vehicle.telemetry.GetChannelSemmantic(i).displayRangeMax}"); // Get maximum value
+			// Debug.Log($"Channel Multiplier: {vehicle.telemetry.GetChannelSemmantic(i).displayMultiplier}"); // Get multiplier
 			}
 
 		    // Get the value for the fourth channel.
