@@ -12,6 +12,18 @@ You shouldn't need to install it, but in case you do:
  - Look for the packages Confluent.Kafka and librdkafka, and install them.
  - Et Voila! Profit!
 
+## First time setup
+
+ ```
+wget https://security.ubuntu.com/ubuntu/pool/main/o/openssl1.0/libssl1.0.0_1.0.2n-1ubuntu5.13_amd64.deb
+sudo dpkg -i libssl1.0.0_1.0.2n-1ubuntu5.13_amd64.deb
+wget https://www.nuget.org/api/v2/package/librdkafka.redist/2.4.0 -O librdkafka.redist.2.4.0.nupkg
+unzip librdkafka.redist.2.4.0.nupkg
+mkdir -p ~/Desktop/project-424-unity/Assets/Plugins/x86_64
+cp runtimes/linux-x64/native/librdkafka.so ~/Desktop/project-424-unity/Assets/Plugins/x86_64/
+
+ ```
+
 
 # Sources
  - https://github.com/GlitchEnzo/NuGetForUnity

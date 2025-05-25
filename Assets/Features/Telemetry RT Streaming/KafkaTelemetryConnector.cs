@@ -22,8 +22,9 @@ namespace Perrinn424
         {
             // Assuming vehicle.telemetry.latest is a DataRow object
             // and you have a method to convert it to a JSON string
-
+            Debug.Log("DataRowToJSON");
             string json = JsonConvert.SerializeObject(vehicle.telemetry.latest);
+            Debug.Log(json);
             return json;
         }
 

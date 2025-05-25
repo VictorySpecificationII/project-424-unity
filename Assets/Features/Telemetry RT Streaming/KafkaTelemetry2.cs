@@ -174,7 +174,8 @@ public class KafkaTelemetry2: VehicleBehaviour
 			};
 
 			string jsonMessage = JsonConvert.SerializeObject(telemetryMessage, Formatting.Indented);
-			Debug.Log(jsonMessage);
+			//Debug.Log(jsonMessage);
+			SendKafkaMessageAsync(jsonMessage);
 
 			}
 
@@ -190,7 +191,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 		private static async Task SendKafkaMessageAsync(string message)
 		{
-			var config = new ProducerConfig { BootstrapServers = "192.168.1.72:9092" };
+			var config = new ProducerConfig { BootstrapServers = "192.168.1.243:9092" };
 
 			// Create a new producer instance
 			using (var producer = new ProducerBuilder<Null, string>(config).Build())
