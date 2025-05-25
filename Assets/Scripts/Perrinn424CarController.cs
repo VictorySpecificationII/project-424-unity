@@ -44,9 +44,9 @@ public struct Perrinn424Data					// ID			DESCRIPTION							UNITS		RESOLUTION		EX
 	public const int PowerBalanceFeedForward	= 2;		// Power balance from torque map		ratio		1000			333 = 0.333 = 33.3%
 	public const int PowerBalance				= 3;		// Final power balance (incl. offset)	ratio		1000			333 = 0.333 = 33.3%
 	public const int Efficiency					= 4;		// Efficiency							ratio		1000			945 = 0.945
-	public const int PreEfficiencyPower			= 5;		// Pre-efficiency power					kW			1000			250000 = 250 kW
-	public const int PreEfficiencyTorque		= 6;		// Pre-efficiency torque				Nm			1000			50000 = 50 Nm
-	public const int MguTorque					= 7;		// Post-efficiency torque				Nm			1000			50000 = 50 Nm
+	public const int ElectricalPower			= 5;		// Electrical power consumed			kW			1000			250000 = 250 kW
+	public const int MguPower					= 6;		// Mgu power provided					kW			1000			250000 = 250 kW
+	public const int MguTorque					= 7;		// Mgu torque provided					Nm			1000			50000 = 50 Nm
 	public const int MguStatorTorque			= 8;		// Pre-inertia torque					Nm			1000			55000 = 55 Nm
 	public const int MguRotorTorque				= 9;		// Final torque in the mgu rotor		Nm			1000			50600 = 50.6 Nm
 	public const int ShaftsTorque				= 10;		// Sum of torques at drive shafts		Nm			1000			150600 = 150.6 Nm
@@ -61,6 +61,7 @@ public struct Perrinn424Data					// ID			DESCRIPTION							UNITS		RESOLUTION		EX
 	public const int InputSteerAngle			= 53;		// Steer angle for the steering column	deg			10000			155000 = 15.5 degrees
 	public const int InputGear					= 54;		// Gear (forward / neutral / reverse)				0 = Neutral, 1 = Forward, -1 = Reverse
 	public const int InputDrsPosition			= 55;		// DRS position. 0 = closed, 1 = open	%			1000			1000 = 1.0 = 100% open
+	public const int InputLiftAndCoast			= 56;		// Lift and coast State								0 = Disabled, 1 = Enabled
 	}
 
 
@@ -97,6 +98,10 @@ public class Perrinn424CarController : VehicleBase
 	// Safety aids
 
 	public TractionControl.Settings tractionControl = new TractionControl.Settings();
+
+	// Other
+
+	public bool allowLiftAndCoastOnAutopilot = false;
 
 	// Speed / power limiter applied externally
 
@@ -198,8 +203,8 @@ public class Perrinn424CarController : VehicleBase
 			channel[baseId + Perrinn424Data.PowerBalanceFeedForward] = (int)(mgu.sensorPowerBalanceFeedForward * 1000);
 			channel[baseId + Perrinn424Data.PowerBalance] = (int)(mgu.sensorPowerBalance * 1000);
 			channel[baseId + Perrinn424Data.Efficiency] = (int)(mgu.sensorEfficiency * 1000);
-			channel[baseId + Perrinn424Data.PreEfficiencyPower] = (int)(mgu.sensorPreEfficiencyPower);
-			channel[baseId + Perrinn424Data.PreEfficiencyTorque] = (int)(mgu.sensorPreEfficiencyTorque * 1000);
+			channel[baseId + Perrinn424Data.ElectricalPower] = (int)(mgu.sensorElectricalPower);
+			channel[baseId + Perrinn424Data.MguPower] = (int)(mgu.sensorMguPower);
 			channel[baseId + Perrinn424Data.MguTorque] = (int)(mgu.sensorMguTorque * 1000);
 			channel[baseId + Perrinn424Data.MguStatorTorque] = (int)(mgu.sensorStatorTorque * 1000);
 			channel[baseId + Perrinn424Data.MguRotorTorque] = (int)(mgu.sensorRotorTorque * 1000);
@@ -213,7 +218,7 @@ public class Perrinn424CarController : VehicleBase
 
 		public string GetDebutStr ()
 			{
-			float power = mgu.sensorRpm * Block.RpmToW * mgu.sensorPreEfficiencyTorque;
+			float power = mgu.sensorRpm * Block.RpmToW * mgu.sensorMguTorque;
 			return $"{power/1000:0.0} kW";
 			}
 
@@ -348,7 +353,6 @@ public class Perrinn424CarController : VehicleBase
 
 		// Initialize internal data
 
-		VPWheelColliderLegacy.disableSteerAngleFix = true;
 		m_gearMode = (int)Gearbox.AutomaticGear.N;
 		m_prevGearMode = (int)Gearbox.AutomaticGear.N;
 		data.Set(Channel.Input, InputData.AutomaticGear, m_gearMode);
@@ -471,6 +475,12 @@ public class Perrinn424CarController : VehicleBase
 			float steeringHalfRange = steering.steeringWheelRange;
 			m_steerAngle = Mathf.Clamp(customData[Perrinn424Data.InputSteerAngle] / 10000.0f, -steeringHalfRange, steeringHalfRange);
 
+			// Lift and Coast. Will be read directly from the bus.
+			// It may also be triggered externally when the inputs are processed.
+
+			if (!allowLiftAndCoastOnAutopilot || customData[Perrinn424Data.InputLiftAndCoast] > 0)
+				inputData[InputData.Retarder] = customData[Perrinn424Data.InputLiftAndCoast];
+
 			// Assume driving not started so disabling autopilot engages brakes
 
 			m_drivingStarted = false;
@@ -529,21 +539,29 @@ public class Perrinn424CarController : VehicleBase
 			m_steerAngle = steerPosition * steering.steeringWheelRange * 0.5f;
 			}
 
+		bool brakePressed = m_brakePosition > brakePressureThreshold;
+
 		// No throttle in any case if the vehicle is turned off
 
 		int ignitionInput = inputData[InputData.Key];
 		if (ignitionInput < 0)
 			m_throttlePosition = 0.0f;
 
-		// Limiter in Reverse mode
+		// Limiter and lift-and-coast feature
+
+		if (brakePressed || m_gear != 1 || ignitionInput < 0)
+			inputData[InputData.Retarder] = 0;
 
 		float effectiveLimiter = mguLimiter;
 		if (m_gear < 0)
 			effectiveLimiter = Mathf.Min(mguLimiter, reverseGearLimiter);
+		else
+		if (inputData[InputData.Retarder] != 0)
+			effectiveLimiter = 0.0f;
 
 		// Apply received inputs to car elements
 
-		if (m_brakePosition > brakePressureThreshold) m_throttlePosition = 0.0f;
+		if (brakePressed) m_throttlePosition = 0.0f;
 		m_frontPowertrain.SetInputs(m_gear, m_throttlePosition, m_brakePosition, effectiveLimiter, powerBalanceOffset);
 		m_rearPowertrain.SetInputs(m_gear, m_throttlePosition, m_brakePosition, effectiveLimiter, powerBalanceOffset);
 
@@ -619,9 +637,9 @@ public class Perrinn424CarController : VehicleBase
 		float engineTorque = m_frontPowertrain.mgu.sensorRotorTorque + m_rearPowertrain.mgu.sensorRotorTorque;
 		vehicleData[VehicleData.EngineTorque] = (int)(engineTorque * 1000.0f);
 
-		// Engine Power: sum of the powers of both motors
+		// Engine Power: sum of the electrical powers of both motors
 
-		float enginePower = m_frontPowertrain.mgu.sensorPreEfficiencyPower + m_rearPowertrain.mgu.sensorPreEfficiencyPower;
+		float enginePower = m_frontPowertrain.mgu.sensorElectricalPower + m_rearPowertrain.mgu.sensorElectricalPower;
 		vehicleData[VehicleData.EnginePower] = (int)(enginePower);
 
         // Engine Load: average of the loads of both motors
@@ -666,6 +684,8 @@ public class Perrinn424CarController : VehicleBase
 		customData[Perrinn424Data.RearRideHeight] = (int)(m_groundTracker.rearRideHeight * 1000.0f);
 		customData[Perrinn424Data.FrontRollAngle] = (int)(m_groundTracker.frontRollAngle * 1000.0f);
 		customData[Perrinn424Data.RearRollAngle] = (int)(m_groundTracker.rearRollAngle * 1000.0f);
+		customData[Perrinn424Data.GroundAngle] = (int)(m_groundTracker.groundAngle * 1000.0f);
+		customData[Perrinn424Data.GroundSlope] = (int)(m_groundTracker.groundSlope * 1000.0f);
 
 		// Understeer
 

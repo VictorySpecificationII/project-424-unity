@@ -4,7 +4,11 @@
 //        http://vehiclephysics.com | @VehiclePhysics
 //--------------------------------------------------------------
 
+// NOTE !IMPORTANT: OpenXR package must be 1.10.0 or lower. Newer versions crash Unity
+// when exiting Play mode, at least in Unity 2021.3.45 with the HP Reberb G2.
 
+
+#if UNITY_2020_3_OR_NEWER
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -79,7 +83,7 @@ public class VRCamera : MonoBehaviour
 
 	void Update ()
 		{
-		if (m_doAutoInitializeVr)
+		if (m_doAutoInitializeVr && IsVRSystemReady())
 			{
 			// VR must be initialized after Start
 
@@ -171,7 +175,6 @@ public class VRCamera : MonoBehaviour
 	// Public component API
 
 
-	[ContextMenu("Recenter HMD")]
 	public void Recenter ()
 		{
 		if (IsVRInitialized() && IsVRActive())
@@ -180,7 +183,7 @@ public class VRCamera : MonoBehaviour
 			if (hasPosition)
 				m_positionOffset = -position;
 			if (hasRotation)
-				m_rotationOffset = Quaternion.Inverse(rotation);
+				m_rotationOffset = ExtractVerticalRotation(Quaternion.Inverse(rotation));
 
 			if (saveRecenterPose)
 				SaveRecenterPose();
@@ -304,6 +307,16 @@ public class VRCamera : MonoBehaviour
 		}
 
 
+	static Quaternion ExtractVerticalRotation (Quaternion rotation)
+		{
+        Vector3 forward = rotation * Vector3.forward;
+        forward.y = 0.0f;
+        forward.Normalize();
+
+        return Quaternion.LookRotation(forward, Vector3.up);
+		}
+
+
 	//------------------------------------------------------------------------------------------------------
 	// Public static API
 	//------------------------------------------------------------------------------------------------------
@@ -321,12 +334,22 @@ public class VRCamera : MonoBehaviour
 		}
 
 
+	public static bool IsVRSystemReady ()
+		{
+		#if XR_MANAGER
+		return XRGeneralSettings.Instance != null && XRGeneralSettings.Instance.Manager != null;
+		#else
+		return false;
+		#endif
+		}
+
+
 	public static void InitializeAndStartVR ()
 		{
 		#if XR_MANAGER
 		XRGeneralSettings.Instance.Manager.InitializeLoaderSync();
 		if (XRSettings.enabled)
- 			XRGeneralSettings.Instance.Manager.StartSubsystems();
+			XRGeneralSettings.Instance.Manager.StartSubsystems();
 		#endif
 		}
 
@@ -334,7 +357,7 @@ public class VRCamera : MonoBehaviour
 	public static void StopAndReleaseVR ()
 		{
 		#if XR_MANAGER
- 		XRGeneralSettings.Instance.Manager.StopSubsystems();
+		XRGeneralSettings.Instance.Manager.StopSubsystems();
 		XRGeneralSettings.Instance.Manager.DeinitializeLoader();
 		#endif
 		}
@@ -497,6 +520,10 @@ public class VRCamera : MonoBehaviour
 
 	[ContextMenu("Stop VR")]
 	public void StopVRMenu () => StopVR();
+
+	[ContextMenu("Recenter HMD")]
+	public void RecenterHMDMenu () => RecenterHMD();
 	}
 
 }
+#endif

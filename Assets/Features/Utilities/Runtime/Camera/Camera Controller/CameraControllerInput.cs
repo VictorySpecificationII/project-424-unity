@@ -17,6 +17,8 @@ namespace Perrinn424.CameraSystem
         public KeyCode followMode = KeyCode.F2;
         public KeyCode orbitMode = KeyCode.F3;
         public KeyCode tvMode = KeyCode.F4;
+        public KeyCode physicsFrontMode = KeyCode.F5;
+        public KeyCode physicsRearMode = KeyCode.F6;
 
 
         private KeyCode vpCameraControllerKey;
@@ -39,7 +41,8 @@ namespace Perrinn424.CameraSystem
             {
                 cameraController.NextMode();
             }
-
+            // Disable F-keys on WebGL
+            #if !UNITY_WEBGL
             if (Input.GetKeyDown(driverMode))
             {
                 cameraController.SetMode(CameraController.Mode.Driver);
@@ -62,6 +65,17 @@ namespace Perrinn424.CameraSystem
             {
                 cameraController.SetMode(CameraController.Mode.Tv);
             }
+
+            if (Input.GetKeyDown(physicsFrontMode))
+            {
+                cameraController.SetMode(CameraController.Mode.PhysicsFront);
+            }
+
+            if (Input.GetKeyDown(physicsRearMode))
+            {
+                cameraController.SetMode(CameraController.Mode.PhysicsRear);
+            }
+            #endif
         }
 
         private void Reset()

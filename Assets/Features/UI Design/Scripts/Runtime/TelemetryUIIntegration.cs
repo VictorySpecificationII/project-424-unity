@@ -1,8 +1,9 @@
-﻿using Perrinn424.Utilities;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.XR;
 using VehiclePhysics;
+﻿using Perrinn424.Utilities;
 
 namespace Perrinn424.UI
 {
@@ -16,22 +17,18 @@ namespace Perrinn424.UI
             Off
         }
 
-        [SerializeField]
-        private RectTransformToScreenCoordinates screenCoordinatesUtility;
+        public RectTransformToScreenCoordinates screenCoordinatesUtility;
+        public VPTelemetryDisplay telemetryDisplay;
+        public VPTelemetryTools telemetryTools;
 
-        [SerializeField]
-        private VPTelemetryDisplay telemetryDisplay;
-        [SerializeField]
-        private VPTelemetryTools telemetryTools;
-
-        [SerializeField]
-        private Mode mode;
-        [SerializeField]
-        private float slimRatio = 0.20f;
-        [SerializeField]
-        private float wideRatio = 0.35f;
+        public Mode mode;
+        public float slimRatio = 1.0f;
+        public float wideRatio = 2.5f;
+        public int minHeightForThickLines = 1000;
 
         private bool initialized = false;
+        private bool vrEnabled = false;
+        private Mode preVrMode;
 
         private Canvas canvas;
         private Canvas Canvas
@@ -51,7 +48,16 @@ namespace Perrinn424.UI
 
         protected override void OnEnable()
         {
-            modes = new CircularIterator<Mode>(new Mode[] { Mode.Slim, Mode.Wide, Mode.ChannelList, Mode.Off });
+            if (telemetryDisplay == null || !telemetryDisplay.enabled)
+            {
+                modes = new CircularIterator<Mode>(new Mode[] { Mode.ChannelList, Mode.Off });
+                if (mode == Mode.Slim || mode == Mode.Wide)
+                    mode = Mode.Off;
+            }
+            else
+            {
+                modes = new CircularIterator<Mode>(new Mode[] { Mode.Slim, Mode.Wide, Mode.ChannelList, Mode.Off });
+            }
 
             screenCoordinatesUtility.RectTransformDimensionsChanged += UpdateTelemetryDimensions;
             modes.Current = mode;
@@ -88,6 +94,7 @@ namespace Perrinn424.UI
             telemetryDisplay.displayY = Mathf.RoundToInt(screenCoordinates.y);
             telemetryDisplay.displayWidth = Mathf.RoundToInt(screenCoordinates.width);
             telemetryDisplay.displayHeight = Mathf.RoundToInt(screenCoordinates.height);
+            telemetryDisplay.thickLines = telemetryDisplay.displayHeight > minHeightForThickLines;
 
             Vector2 pos = screenCoordinates.position;
             pos.x = screenCoordinates.x + screenCoordinates.size.x - telemetryTools.channelListRect.width;
@@ -106,6 +113,26 @@ namespace Perrinn424.UI
             {
                 modes.MoveNext();
                 SetMode(modes.Current);
+            }
+
+            // Detect VR and auto-disable telemetry
+
+            if (!vrEnabled && XRSettings.isDeviceActive)
+            {
+                vrEnabled = true;
+                preVrMode = modes.Current;
+                modes.Current = Mode.Off;
+                SetMode(Mode.Off);
+            }
+            else
+            if (vrEnabled && !XRSettings.isDeviceActive)
+            {
+                vrEnabled = false;
+                if (modes.Current == Mode.Off)
+                {
+                    modes.Current = preVrMode;
+                    SetMode(preVrMode);
+                }
             }
         }
 
@@ -140,11 +167,9 @@ namespace Perrinn424.UI
 
         private void SetRatio(float ratio)
         {
-            RectTransform parentRectTransform = this.transform.parent as RectTransform;
-            Vector2 anchorMin = parentRectTransform.anchorMin;
-            float minAnchorX = 1.0f - ratio;
-            anchorMin.x = minAnchorX;
-            parentRectTransform.anchorMin = anchorMin;
+            RectTransform parentRect = this.transform.parent as RectTransform;
+            float width = parentRect.rect.width;
+            (this.transform as RectTransform).SetInsetAndSizeFromParentEdge(RectTransform.Edge.Right, 0, width * ratio);
         }
     }
 }
