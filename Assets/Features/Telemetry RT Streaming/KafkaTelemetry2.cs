@@ -175,7 +175,7 @@ public class KafkaTelemetry2: VehicleBehaviour
 
 			string jsonMessage = JsonConvert.SerializeObject(telemetryMessage, Formatting.Indented);
 			//Debug.Log(jsonMessage);
-			SendKafkaMessageAsync(jsonMessage);
+			//SendKafkaMessageAsync(jsonMessage);
 
 			}
 
