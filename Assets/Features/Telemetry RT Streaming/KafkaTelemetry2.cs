@@ -28,7 +28,10 @@
 
 //----------------------------------------------APPROACH 1 - "Snapshot Mode"----------------------------------------------------//
 
+//version that queues messages in a background thread instead of sending them directly on the Unity main thread (which would eliminate any frame-time spikes)
 
+
+using System;
 using UnityEngine;
 using VehiclePhysics;
 using VehiclePhysics.InputManagement;
@@ -44,26 +47,51 @@ namespace Perrinn424
     {
         public bool emitTelemetry = true;
 
-        // Time control for one-second interval sending
         private float lastSendTime = 0f;
         private readonly float sendInterval = 1f;
 
         private string vehicleId;
         private string sessionId;
 
+        // Persistent Kafka producer
+        private IProducer<Null, string> producer;
+        private ProducerConfig kafkaConfig;
+
         public override void OnEnableVehicle()
         {
             Debug.Log("[KafkaTelemetry2] Vehicle enabled: Kafka telemetry component active.");
 
-            // Initialize IDs on enable
             vehicleId = System.Environment.MachineName;
             sessionId = System.DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-development";
+
+            // Initialize Kafka once
+            kafkaConfig = new ProducerConfig
+            {
+                BootstrapServers = "localhost:9092",
+                ClientId = vehicleId,
+                Acks = Acks.All,
+                MessageTimeoutMs = 5000
+            };
+
+            producer = new ProducerBuilder<Null, string>(kafkaConfig).Build();
+            Debug.Log("[KafkaTelemetry2] Kafka producer initialized.");
         }
 
-        public override bool EmitTelemetry()
+        public override void OnDisableVehicle()
         {
-            return emitTelemetry;
+            try
+            {
+                producer?.Flush(TimeSpan.FromSeconds(2));
+                producer?.Dispose();
+                Debug.Log("[KafkaTelemetry2] Kafka producer disposed cleanly.");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[KafkaTelemetry2] Error while disposing Kafka producer: {e.Message}");
+            }
         }
+
+        public override bool EmitTelemetry() => emitTelemetry;
 
         public override void RegisterTelemetry()
         {
@@ -79,34 +107,18 @@ namespace Perrinn424
 
         public class Perrinn424Distance : Telemetry.ChannelGroup
         {
-            public override int GetChannelCount()
-            {
-                // Adjust to your actual channel count if needed
-                return 2;
-            }
+            public override int GetChannelCount() => 2;
 
-            public override Telemetry.PollFrequency GetPollFrequency()
-            {
-                // Use Normal since Slow is unavailable
-                return Telemetry.PollFrequency.Normal;
-            }
+            public override Telemetry.PollFrequency GetPollFrequency() => Telemetry.PollFrequency.Normal;
 
-            public override void GetChannelInfo(Telemetry.ChannelInfo[] channelInfo, Object instance)
-            {
-                // Optional channel info
-            }
-
-            public override void PollValues(float[] values, int index, Object instance)
+            public override void PollValues(float[] values, int index, UnityEngine.Object instance)
             {
                 KafkaTelemetry2 kafkaTelemetry = instance as KafkaTelemetry2;
                 if (kafkaTelemetry == null) return;
 
-                // Only send once every 1 second
+                // Send every 1s
                 if (Time.time - kafkaTelemetry.lastSendTime < kafkaTelemetry.sendInterval)
-                {
-                    // Skip sending this poll
                     return;
-                }
                 kafkaTelemetry.lastSendTime = Time.time;
 
                 VehicleBase vehicle = kafkaTelemetry.vehicle;
@@ -119,7 +131,7 @@ namespace Perrinn424
                     Telemetry.ChannelInfo channelInfo = vehicle.telemetry.channels[i];
                     Telemetry.ChannelGroupInfo groupInfo = channelInfo.group;
 
-                    var telemetryMessage = new
+                    batch.Add(new
                     {
                         VehicleId = kafkaTelemetry.vehicleId,
                         SessionId = kafkaTelemetry.sessionId,
@@ -138,40 +150,28 @@ namespace Perrinn424
                         UpdateInterval = groupInfo.updateInterval,
                         FrequencyLabel = groupInfo.updateFrequencyLabel,
                         Semantic = channelInfo.semantic.ToString()
-                    };
-
-                    batch.Add(telemetryMessage);
+                    });
                 }
 
                 if (kafkaTelemetry.emitTelemetry)
                 {
-                    string jsonBatch = JsonConvert.SerializeObject(batch, Formatting.Indented);
-                    _ = SendKafkaMessageAsync(jsonBatch);
+                    string jsonBatch = JsonConvert.SerializeObject(batch, Formatting.None);
+                    _ = kafkaTelemetry.SendKafkaMessageAsync(jsonBatch);
                 }
-
-                // Optional dummy telemetry output
-                // values[index + 0] = 0.0f;
-                // values[index + 1] = 0.0f;
             }
         }
 
-        private static async Task SendKafkaMessageAsync(string message)
+        private async Task SendKafkaMessageAsync(string message)
         {
-            var config = new ProducerConfig { BootstrapServers = "192.168.1.243:9092" };
-
-            using (var producer = new ProducerBuilder<Null, string>(config).Build())
+            try
             {
-                try
-                {
-                    var kafkaMessage = new Message<Null, string> { Value = message };
-                    Debug.Log($"[KafkaTelemetry2] Sending batch to Kafka:\n{message}");
-                    var deliveryResult = await producer.ProduceAsync("p424-telemetry-batch", kafkaMessage);
-                    Debug.Log($"[KafkaTelemetry2] Batch delivered to {deliveryResult.TopicPartitionOffset}");
-                }
-                catch (ProduceException<Null, string> e)
-                {
-                    Debug.LogError($"[KafkaTelemetry2] Delivery failed: {e.Error.Reason}");
-                }
+                var kafkaMessage = new Message<Null, string> { Value = message };
+                var deliveryResult = await producer.ProduceAsync("p424-telemetry-batch", kafkaMessage);
+                Debug.Log($"[KafkaTelemetry2] Batch delivered to {deliveryResult.TopicPartitionOffset}");
+            }
+            catch (ProduceException<Null, string> e)
+            {
+                Debug.LogError($"[KafkaTelemetry2] Kafka delivery failed: {e.Error.Reason}");
             }
         }
     }
