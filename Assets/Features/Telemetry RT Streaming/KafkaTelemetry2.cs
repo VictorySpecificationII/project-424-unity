@@ -51,7 +51,7 @@ namespace Perrinn424
         private string vehicleId;
         private string sessionId;
 
-        private IProducer<Null, string> producer; // Persistent producer
+        private IProducer<string, string> producer; // Persistent producer
         private readonly string kafkaTopic = "p424-telemetry-batch";
         private readonly string bootstrapServers = "localhost:9092";
 
@@ -64,7 +64,7 @@ namespace Perrinn424
             sessionId = System.DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-development";
 
             var config = new ProducerConfig { BootstrapServers = bootstrapServers };
-            producer = new ProducerBuilder<Null, string>(config).Build();
+            producer = new ProducerBuilder<string, string>(config).Build();
 
         }
 
@@ -185,7 +185,7 @@ namespace Perrinn424
 
             try
             {
-                var kafkaMessage = new Message<Null, string> { Value = message };
+                var kafkaMessage = new Message<string, string> { Key = vehicleId, Value = message };
                 Debug.Log($"[KafkaTelemetry2] Sending batc   to Kafka:\n{message}");
                 var deliveryResult = await producer.ProduceAsync(kafkaTopic, kafkaMessage);
                 Debug.Log($"[KafkaTelemetry2] Batch delivered to {deliveryResult.TopicPartitionOffset}");
