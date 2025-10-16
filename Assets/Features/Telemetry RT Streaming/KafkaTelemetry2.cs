@@ -52,7 +52,8 @@ namespace Perrinn424
         private string sessionId;
 
         private IProducer<string, string> producer; // Persistent producer
-        private readonly string kafkaTopic = "p424-telemetry-batch";
+//        private readonly string kafkaTopic = "p424-telemetry-batch";
+        private string kafkaTopic = "p424-telemetry-batch-" + System.DateTime.Now.ToString("yyyyMMdd-HHmmss");
         private readonly string bootstrapServers = "localhost:9092";
 
         public override void OnEnableVehicle()
